@@ -1,0 +1,41 @@
+#!/bin/bash 
+
+# Detect common secret patterns (passwords, API keys, tokens) 
+
+ASSIGNMENT_REGEX="(password|secret|apikey|token)[[:space:]]*[=:][[:space:]]*['\"][^'\"]+['\"]" 
+
+TOKEN_REGEX="(ghp_[a-zA-Z0-9]{36}|xoxb-[0-9]{10,13}-[a-zA-Z0-9-]+)" 
+
+# Scan staged changes 
+
+MATCHES=$(git diff --cached | grep -Ein "$ASSIGNMENT_REGEX|$TOKEN_REGEX") 
+
+if [ -n "$MATCHES" ]; then 
+
+    echo "==========================================================" 
+
+    echo "COMMIT BLOCKED: Potential hardcoded secret detected!" 
+
+    echo "" 
+
+    echo "Details:" 
+
+    echo "$MATCHES" 
+
+    echo "" 
+
+    echo "Recommended Actions:" 
+
+    echo "- Remove hardcoded secrets" 
+
+    echo "- Use environment variables instead" 
+
+    echo "- Use secure vaults (e.g., Azure Key Vault)" 
+
+    echo "" 
+
+    echo "==========================================================" 
+
+    exit 1 
+
+fi
